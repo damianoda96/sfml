@@ -2,9 +2,9 @@
 #define ENEMYARRAY_H_INCLUDED
 
 #include "gameArrays.h"
+#include "Enemy.h"
 #include <iostream>
 #include <vector>
-#include "Enemy.h"
 
 struct enemyArray : gameArrays, std::vector<Enemy>
 {

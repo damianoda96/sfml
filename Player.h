@@ -29,7 +29,9 @@ struct Player
 
     void Jump();
     void moveRight(float);
+    void hitMoveRight(float);
     void moveLeft(float);
+    void hitMoveLeft(float);
     void checkCollision(platformArray, collectibleArray);
 
     float getPlayerTop();
@@ -43,14 +45,18 @@ struct Player
 
     void addScore();
     void loseScore();
+    void resetScore();
+    int getPlayerScore();
 
     void loseHealth();
     void addHealth();
+    void resetHealth();
+    int getPlayerHealth();
 
     private:
 
-        int playerScore;
         int playerHealth;
+        int playerScore;
 };
 
 #endif // PLAYER_H_INCLUDED

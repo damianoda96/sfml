@@ -89,6 +89,17 @@ void Player::moveRight(float deltaTime)
     playerRect.move(playerSpeed * deltaTime - playerRightAcc, 0.f);
 }
 
+void Player::hitMoveLeft(float deltaTime)
+{
+    playerRect.move(-playerSpeed * deltaTime, 0.f);
+
+}
+
+void Player::hitMoveRight(float deltaTime)
+{
+    playerRect.move(playerSpeed * deltaTime, 0.f);
+}
+
 
 float Player::getPlayerTop()
 {
@@ -126,6 +137,16 @@ void Player::loseScore()
     playerScore -= 10;
     scoreText.setString("SCORE:"+to_string(playerScore));
 }
+void Player::resetScore()
+{
+    playerScore = 0;
+    scoreText.setString("SCORE:"+to_string(playerScore));
+}
+
+int Player::getPlayerScore()
+{
+    return playerScore;
+}
 
 void Player::addHealth()
 {
@@ -137,6 +158,16 @@ void Player::loseHealth()
 {
     playerHealth--;
     healthText.setString("HEALTH:"+to_string(playerHealth));
+}
+void Player::resetHealth()
+{
+    playerHealth = 3;
+    healthText.setString("HEALTH:"+to_string(playerHealth));
+}
+
+int Player::getPlayerHealth()
+{
+    return playerHealth;
 }
 
 

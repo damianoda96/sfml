@@ -423,7 +423,7 @@
 
 1489069116 c:\users\deven\desktop\sfml\gamearrays.h
 
-1491172191 source:c:\users\deven damiano\desktop\sfml\main.cpp
+1491194462 source:c:\users\deven damiano\desktop\sfml\main.cpp
 	<SFML/Graphics.hpp>
 	"Player.h"
 	"Platform.h"
@@ -880,11 +880,11 @@
 1491166488 c:\users\deven damiano\desktop\sfml\enemy.h
 	<SFML/Graphics.hpp>
 
-1491171693 c:\users\deven damiano\desktop\sfml\enemyarray.h
+1491192923 c:\users\deven damiano\desktop\sfml\enemyarray.h
 	"gameArrays.h"
+	"Enemy.h"
 	<iostream>
 	<vector>
-	"Enemy.h"
 
 1491172663 c:\users\deven damiano\desktop\sfml\creategameobjects.hpp
 	<SFML/Graphics.hpp>
