@@ -8,6 +8,26 @@
 #include "Enemy.h"
 #include "enemyArray.h"
 #include "createGameObjects.hpp"
+#include "buildLevel.hpp"
+#include "Door.h"
+#include "doorArray.h"
+#include <iostream>
+#include <string>
+#include<sstream>
+
+//THIS IS A FIX FOR TO.STRING()
+template <typename T>
+std::string to_string(T value)
+{
+    //create an output string stream
+    std::ostringstream os ;
+
+    //throw the value into the string stream
+    os << value ;
+
+    //convert the string stream into a string and return
+    return os.str() ;
+}
 
 int main()
 {
@@ -16,7 +36,7 @@ int main()
     const int gameHeight = 600;
 
     //GAME LEVEL
-    int level = 0;
+    int level = 1;
 
     //Create the application window
     sf::RenderWindow window(sf::VideoMode(gameWidth, gameHeight, 32), "My Game",
@@ -24,32 +44,30 @@ int main()
     window.setVerticalSyncEnabled(true);
 
     //Initialize view
-    sf::View viewport(sf::Vector2f(400, 300), sf::Vector2f(800, 600));
+    sf::View viewport(sf::Vector2f(400, 300), sf::Vector2f(gameWidth, gameHeight));
+
 
     //Initialize Menu
     Menu mainMenu;
 
-    //SCORE COUNTER
-    int score = 0;
-
     //Physics
     float playerSpeed = 400.f;
-    float gravity = 10.f;
-    float fallingGrav = 1.f;
+    //float gravity = 10.f;
+    //float fallingGrav = 1.f;
 
     Player player;
 
     platformArray platforms;
     collectibleArray collectibles;
     enemyArray enemies;
-
-    //CREATES OUR GAME OBJECTS
-    createGameObjects(level, platforms, collectibles, enemies);
+    doorArray doors;
 
     //Clock
     sf::Clock clock;
 
     bool isPlaying = false;
+    bool gameOver  = false;
+    bool nextLevel = false;
 
     while (window.isOpen())
     {
@@ -65,44 +83,21 @@ int main()
                 break;
             }
 
-            // Space key pressed:
+            // Tab key pressed:
             if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Tab))
             {
                 if(!isPlaying)
                 {
-                    //restart Game
+                    //CREATE OBJECTS AND PLACE OBJECTS DEPENDING ON LEVEL
+                    buildLevel(level, gameWidth, gameHeight, player, platforms, collectibles, enemies, doors);
+
+                    //RESTART GAME//////////////////////
                     isPlaying = true;
+                    gameOver = false;
                     clock.restart();
 
-                    //Reset player Position
-                    player.playerRect.setPosition(gameWidth/2, gameHeight/2);
-
-                    ///////////////////////////SET PLATFORM POSITIONS/////////////////////////////////////////
-                    for(std::size_t first = 0; first < platforms.size(); first++)
-                    {
-                        if(first < 5)
-                        {
-                            platforms[first].platformRect.setPosition(gameWidth/2 + (first * 100), gameHeight/2 + 100.f); //+ (first * 50));
-                        }
-                        else
-                        {
-                            platforms[first].platformRect.setPosition(gameWidth/2 + (first * 100) - 300, gameHeight/2 - (first * 50) + 200);
-                        }
-                    }
-
-                    //////////////////////////SET COLLECTIBLE POSITIONS//////////////////////////////////////////////////////////////
-                    for(std::size_t first = 0; first < collectibles.size(); first++)
-                    {
-                        if(first < 2)
-                        {
-                            collectibles[first].collectibleRect.setPosition(gameWidth/2 + (first * 100) + 300, gameHeight/2 + 60.f);
-                        }
-                        else
-                        {
-                            collectibles[first].collectibleRect.setPosition(gameWidth/2 + (first * 100) + 200, gameHeight/2 - 100.f);
-                        }
-
-                    }
+                    //RESET PLAYER SCORE AND HEALTH////////////////
+                    player.resetHealth();
                 }
             }
         }
@@ -117,6 +112,12 @@ int main()
             player.healthText.setPosition(player.playerRect.getPosition().x + 225.f, player.playerRect.getPosition().y -250.f);
 
             float deltaTime = clock.restart().asSeconds();
+
+            if(player.getPlayerHealth() < 1)
+            {
+                gameOver = true;
+                isPlaying = false;
+            }
 
             /////////////////////SIDEWAYS MOVEMENT///////////////////////////////////////////////
 
@@ -166,61 +167,27 @@ int main()
                 }
             }
 
-            //RESTART GAME WHEN R IS PRESSED////
-            //FIX THIS !!!//////
-
+            //RESTART GAME WHEN R IS PRESSED//////////////////////////
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::R))
             {
-                player.playerRect.setPosition(gameWidth/2, gameHeight/2 - 100.f);
+                player.isJumping = false;
+                player.isFalling = false;
+                isPlaying = false;
+                viewport.setCenter(400, 300);
+                window.setView(viewport);
+                platforms.clear();
+                collectibles.clear();
+                enemies.clear();
             }
 
+            /////////////////////PLAYER/PLATFORM HORIZONTAL COLLISION AND ONPLATFORM CHECKS//////////////////////////
 
-            /////////////////////IF WE ARENT JUMPING AND HIT THE SIDE OF A BLOCK//////////////////////////
-
-            ///////////////IF PLAYER HITS THE SIDE OF A BLOCK FROM THE RIGHT/////////////////////
             for(std::size_t i = 0; i <= platforms.size(); i++)
             {
-                if((player.getPlayerRight() >= platforms[i].getPlatformLeft() - 5.f)
-                    && (player.getPlayerRight() < platforms[i].getPlatformLeft() + 10.f)
-                    && (player.getPlayerTop() < platforms[i].getPlatformBottom())
-                    && (player.getPlayerLeft() < platforms[i].getPlatformLeft())
-                    && (player.getPlayerBottom() >= platforms[i].getPlatformBottom()
-                        || player.getPlayerBottom() >= platforms[i].getPlatformTop() ))
-                {
-                    player.canMoveRight = false;
-                    player.playerRect.setPosition(platforms[i].getPlatformLeft() - player.playerSize.x/2.f - 2.f, player.playerRect.getPosition().y);
-                    break;
-                }
-                else if((player.getPlayerTop() > platforms[i].getPlatformBottom()
-                    && player.getPlayerBottom() > platforms[i].getPlatformBottom())
-                    || (player.getPlayerBottom() < platforms[i].getPlatformTop()
-                        && player.getPlayerTop() < platforms[i].getPlatformTop()))
-                {
-                    player.canMoveRight = true;
-                }
+                platforms[i].checkHorizCollision(player);
 
-                ///////////////////////////////IF PLAYER HITS THE SIDE OF A BLOCK FROM THE LEFT////////////////////////////
-
-                if((player.getPlayerLeft() <= platforms[i].getPlatformRight() + 5.f)
-                    && (player.getPlayerLeft() > platforms[i].getPlatformRight() - 10.f)
-                    && (player.getPlayerTop() < platforms[i].getPlatformBottom())
-                    && (player.getPlayerRight() > platforms[i].getPlatformRight())
-                    && (player.getPlayerBottom() >= platforms[i].getPlatformBottom()
-                        || player.getPlayerBottom() >= platforms[i].getPlatformTop() ))
-                {
-                    player.canMoveLeft = false;
-                    player.playerRect.setPosition(platforms[i].getPlatformRight() + player.playerSize.x/2.f + 2.f, player.playerRect.getPosition().y);
-                    break;
-                }
-                else if((player.getPlayerTop() > platforms[i].getPlatformBottom()
-                        && player.getPlayerBottom() > platforms[i].getPlatformBottom())
-                        || (player.getPlayerBottom() < platforms[i].getPlatformTop()
-                            && player.getPlayerTop() < platforms[i].getPlatformTop()))
-                {
-                    player.canMoveLeft = true;
-                }
+                platforms[i].checkOnPlat(player);
             }
-            /////////////////////////////////////////////////////////////////////////////////////////
 
             /////////////////////////JUMPING///////////////////////////////////////////////////
 
@@ -231,160 +198,93 @@ int main()
                     player.canJump = false;
                     player.isJumping = true;
                 }
+
+                if(player.canWallJump)
+                {
+                    std::cout << "JUMP";
+                    player.isJumping = false;
+                    player.isFalling = false;
+                    player.canWallJump = false;
+                    player.isWallJumping = true;
+                }
+
             }
 
-            if(!player.onPlatform)
+            if(!player.onPlatform && !player.isJumping && !player.isWallJumping)
             {
                 player.isFalling = true;
                 player.canJump = false;
-            }
 
-            //////////////////////IF WE ARE ON A PLATFORM//////////////////////////////////////////
-
-            for(std::size_t i = 0; i <= platforms.size(); i++)
-            {
-                if((player.getPlayerBottom() >= platforms[i].getPlatformTop() - 2.f)
-                    && (player.getPlayerBottom() <= platforms[i].getPlatformBottom())
-                    && (player.getPlayerLeft() <= platforms[i].getPlatformRight())
-                    && (player.getPlayerRight() >= platforms[i].getPlatformLeft()))
-                {
-                    player.onPlatform = true;
-                    break;
-                }
-                else
-                {
-                    player.onPlatform = false;
-                }
             }
 
             /////////////////////////////////////////IF WE ARE JUMPING////////////////////////////////////////////////////
 
             if(!player.canJump)
             {
-                if(player.isJumping == true)
+                if(player.isJumping)
                 {
-                    player.playerRect.move(0.f, -playerSpeed * deltaTime - gravity);
-                    gravity-=1.f;
+                    player.jump(deltaTime);
                 }
-                else if(player.isFalling == true)
-                {
-                    player.playerRect.move(0.f, (player.playerSpeed * deltaTime) + fallingGrav);
-                    fallingGrav+=.5;
 
+                if(player.isWallJumping)
+                {
+                    player.wallJump(deltaTime);
                 }
-                //check collision between player and platform
+
+                if(player.isFalling)
+                {
+                    player.fall(deltaTime);
+                }
+
+
+
+                //CHECK FOR VERTICAL COLLISION BETWEEN PLAYER AND PLATFORM
                 for(std::size_t i = 0; i <= platforms.size(); i++)
                 {
-                    ///////////////IF PLAYER HITS THE SIDE OF A BLOCK FROM THE RIGHT/////////////////////
-
-                    /*if((player.getPlayerRight() >= platforms[i].getPlatformLeft() - 5.f)
-                        && (player.getPlayerRight() < platforms[i].getPlatformLeft() + 5.f)
-                        && (player.getPlayerTop() < platforms[i].getPlatformBottom())
-                        && (player.getPlayerLeft() < platforms[i].getPlatformLeft())
-                        && (player.getPlayerBottom() >= platforms[i].getPlatformBottom()
-                            || player.getPlayerBottom() >= platforms[i].getPlatformTop() ))
-                    {
-                        player.canMoveRight = false;
-                        player.playerRect.setPosition(platforms[i].getPlatformLeft() - player.playerSize.x/2.f - 2.f, player.playerRect.getPosition().y);
-                        //break;
-                    }
-                    else if((player.getPlayerTop() > platforms[i].getPlatformBottom()
-                            && player.getPlayerBottom() > platforms[i].getPlatformBottom())
-                            || (player.getPlayerBottom() < platforms[i].getPlatformTop()
-                                && player.getPlayerTop() < platforms[i].getPlatformTop()))
-                    {
-                        player.canMoveRight = true;
-                    }
-
-                    ///////////////////////////////IF PLAYER HITS THE SIDE OF A BLOCK FROM THE LEFT////////////////////////////
-
-                    if((player.getPlayerLeft() <= platforms[i].getPlatformRight() + 5.f)
-                        && (player.getPlayerLeft() > platforms[i].getPlatformRight() - 5.f)
-                        && (player.getPlayerTop() < platforms[i].getPlatformBottom())
-                        && (player.getPlayerRight() > platforms[i].getPlatformRight())
-                        && (player.getPlayerBottom() >= platforms[i].getPlatformBottom()
-                            || player.getPlayerBottom() >= platforms[i].getPlatformTop() ))
-                    {
-                        player.canMoveLeft = false;
-                        player.playerRect.setPosition(platforms[i].getPlatformRight() + player.playerSize.x/2.f + 2.f, player.playerRect.getPosition().y);
-                        //break;
-                    }
-                    else if((player.getPlayerTop() > platforms[i].getPlatformBottom()
-                            && player.getPlayerBottom() > platforms[i].getPlatformBottom())
-                            || (player.getPlayerBottom() < platforms[i].getPlatformTop()
-                                && player.getPlayerTop() < platforms[i].getPlatformTop()))
-                    {
-                        player.canMoveLeft = true;
-                    }*/
-
-                    /////////////////////////IF WE HIT THE TOP OF A PLATFORM////////////////////////////////
-
-                    if((player.getPlayerBottom() > platforms[i].getPlatformTop())
-                        && (player.getPlayerBottom() < platforms[i].getPlatformBottom())
-                        && (player.getPlayerRight() >= platforms[i].getPlatformLeft())
-                        && (player.getPlayerLeft() <= platforms[i].getPlatformRight()))
-                    {
-                        player.onPlatform = true;
-                        player.isJumping = false;
-                        player.isFalling = false;
-                        fallingGrav = 1.f;
-                        gravity = 10.f;
-                        player.playerRect.setPosition(player.playerRect.getPosition().x, platforms[i].getPlatformTop() - player.playerSize.y/2 - 2.f);
-                        player.canJump = true;
-                        player.canMoveRight = true;
-                        break;
-                    }
-
-                    ////////////////////////////IF WE HIT THE BOTTOM OF A PLATFORM///////////////////////////
-
-                    if((player.getPlayerTop() <= platforms[i].getPlatformBottom())
-                        && (player.getPlayerBottom() >= platforms[i].getPlatformTop())
-                        && (player.getPlayerRight() >= platforms[i].getPlatformLeft())
-                        && (player.getPlayerLeft() <= platforms[i].getPlatformRight()))
-                    {
-                        gravity = -10.f;
-                        player.playerRect.move(0.f, -playerSpeed * deltaTime - gravity);
-                        gravity-=1.f;
-                        break;
-                    }
-
-                    ///////////////////////////////////////////////////////////////////////////////////////
+                    platforms[i].checkVertCollision(player, deltaTime);//fallingGrav, gravity, deltaTime);
                 }
-
             }
 
             ///////////////////////////////////////END OF JUMPING///////////////////////////////////////////
 
             ///////////////PLAYER/COLLECTIBLE COLLISION///////////////
+
             if(collectibles.size() > 0)
             {
                 collectibleArray::iterator first = collectibles.begin();
+                int counter = 0;
 
                 while(first != collectibles.end())
                 {
-                    if(player.getPlayerRight() >= first->getCollectibleLeft()
-                       && player.getPlayerLeft() <= first->getCollectibleRight()
-                       && player.getPlayerBottom() >= first->getCollectibleBottom()
-                       && player.getPlayerTop() <= first->getCollectibleTop())
+
+                    if(collectibles[counter].checkCollision(player))
                     {
                         collectibles.erase(first);
                         player.addScore();
                     }
-                    else if(player.getPlayerRight() >= first->getCollectibleLeft()
-                       && player.getPlayerLeft() <= first->getCollectibleRight()
-                       && player.getPlayerBottom() >= first->getCollectibleTop()
-                       && player.getPlayerBottom() <= first->getCollectibleBottom())
+                    else
                     {
-                        collectibles.erase(first);
-                        player.addScore();
+                        first++;
+                        counter++;
                     }
-                    else if(player.getPlayerRight() >= first->getCollectibleLeft()
-                       && player.getPlayerLeft() <= first->getCollectibleRight()
-                       && player.getPlayerTop() >= first->getCollectibleTop()
-                       && player.getPlayerTop() <= first->getCollectibleBottom())
+                }
+            }
+
+            ///////////////PLAYER/ENEMY COLLISION///////////////
+
+            if(enemies.size() > 0)
+            {
+                enemyArray::iterator first = enemies.begin();
+
+                while(first != enemies.end())
+                {
+                    if(first->checkCollision(player))
                     {
-                        collectibles.erase(first);
-                        player.addScore();
+                        player.loseHealth();
+                        gameOver = true;
+                        isPlaying = false;
+                        nextLevel = false;
+                        break;
                     }
                     else
                     {
@@ -393,12 +293,19 @@ int main()
                 }
             }
 
+            //PLAYER/DOOR COLLISION///////////////////////////
+            //IF ALL COINS COLLECTED AND W IS PRESSED WHILE COLLIDING WITH DOOR, GO TO NEXT LEVEL!
+
+            if(doors[0].checkCollision(player) && sf::Keyboard::isKeyPressed(sf::Keyboard::W) && collectibles.size() == 0)
+            {
+                isPlaying = false;
+                nextLevel = true;
+                level++;
+            }
 
         }
 
         /////////////////////////////END OF GAME LOOP////////////////////////////////////////////////////////////
-
-
 
         //clear the window
         window.clear();
@@ -418,10 +325,38 @@ int main()
             {
                 window.draw(collectibles[first].collectibleRect);
             }
+            for(std::size_t first = 0; first < enemies.size(); first++)
+            {
+                window.draw(enemies[first].enemyRect);
+            }
+
+            window.draw(doors[0].doorRect);
         }
-        else  //draw pause screen
+        else if(!isPlaying && !gameOver && !nextLevel) //draw pause screen
         {
             window.draw(mainMenu.titleText);
+        }
+        else if(!isPlaying && !gameOver && nextLevel)
+        {
+            //IF WE MOVE TO NEXT LEVEL
+            viewport.setCenter(400,300);
+            window.setView(viewport);
+            mainMenu.levelText.setString("LEVEL " + to_string(level));
+            window.draw(mainMenu.levelText);
+            platforms.clear();
+            collectibles.clear();
+            enemies.clear();
+            doors.clear();
+        }
+        else if(!isPlaying && gameOver && !nextLevel)
+        {
+            //IF GAME OVER
+            window.draw(mainMenu.gameOverText);
+            player.resetScore();
+            platforms.clear();
+            collectibles.clear();
+            enemies.clear();
+            doors.clear();
         }
 
         //display things on the screen

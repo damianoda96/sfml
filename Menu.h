@@ -5,11 +5,19 @@
 
 struct Menu
 {
-//Initialize pause message
+    //Initialize pause message
     sf::Text titleText;
 
+    //Initialize game over message
+    sf::Text gameOverText;
+
+    //Initialize level message
+    sf::Text levelText;
+
     // Load the text font
-    sf::Font titleFont;
+    sf::Font font;
+
+
 
     Menu();
 };

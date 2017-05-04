@@ -2,6 +2,7 @@
 #define COLLECTIBLE_H_INCLUDED
 
 #include <SFML/Graphics.hpp>
+#include "Player.h"
 
 struct Collectible
 {
@@ -15,6 +16,8 @@ struct Collectible
     float getCollectibleBottom();
     float getCollectibleLeft();
     float getCollectibleRight();
+
+    bool checkCollision(Player&);
 
 };
 

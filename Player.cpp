@@ -1,21 +1,21 @@
 #include <SFML/Graphics.hpp>
-#include <../Player.h>
+#include "Player.h"
 #include <iostream>
 #include <string>
 #include<sstream>
 
 template <typename T>
-    std::string to_string(T value)
-    {
-      //create an output string stream
-      std::ostringstream os ;
+std::string to_string(T value)
+{
+    //create an output string stream
+    std::ostringstream os ;
 
-      //throw the value into the string stream
-      os << value ;
+    //throw the value into the string stream
+    os << value ;
 
-      //convert the string stream into a string and return
-      return os.str() ;
-    }
+    //convert the string stream into a string and return
+    return os.str() ;
+}
 
 
 Player::Player()
@@ -33,7 +33,13 @@ Player::Player()
     playerRightAcc = 5.f;
     playerLeftAcc = 5.f;
 
+    wallJumpGrav = 10.f;
+    gravity = 10.f;
+    fallingGrav = 1.f;
+
     canJump = true;
+    canWallJump = false;
+    isWallJumping = false;
     isJumping = false;
     isFalling = false;
     onPlatform = false;
@@ -64,9 +70,28 @@ Player::Player()
 
 }
 
-void Player::Jump()
+void Player::jump(float deltaTime)//, float& gravity, float& fallingGrav)
 {
-    //ADD ALL PLAYER JUMPING ALGORITHMS HERE
+    if(!isWallJumping)
+    {
+        playerRect.move(0.f, -playerSpeed * deltaTime - gravity);
+        gravity-=1.f;
+    }
+}
+
+void Player::fall(float deltaTime)
+{
+    if(!isWallJumping)
+    {
+        playerRect.move(0.f, (playerSpeed * deltaTime) + fallingGrav);
+        fallingGrav+=.5;
+    }
+}
+
+void Player::wallJump(float deltaTime)
+{
+    playerRect.move(0.f, -playerSpeed * deltaTime - wallJumpGrav);
+    wallJumpGrav-=1.f;
 }
 
 void Player::moveLeft(float deltaTime)
@@ -87,6 +112,17 @@ void Player::moveRight(float deltaTime)
     }
 
     playerRect.move(playerSpeed * deltaTime - playerRightAcc, 0.f);
+}
+
+void Player::hitMoveLeft(float deltaTime)
+{
+    playerRect.move(-playerSpeed * deltaTime, 0.f);
+
+}
+
+void Player::hitMoveRight(float deltaTime)
+{
+    playerRect.move(playerSpeed * deltaTime, 0.f);
 }
 
 
@@ -110,11 +146,6 @@ float Player::getPlayerRight()
     return (playerRect.getPosition().x + playerSize.x/2.f);
 }
 
-void Player::checkCollision(platformArray platforms, collectibleArray collectibles)
-{
-    //PUT ALL PLAYER COLLISIONS HERE INSTEAD OF MAIN
-}
-
 void Player::addScore()
 {
     playerScore += 10;
@@ -125,6 +156,16 @@ void Player::loseScore()
 {
     playerScore -= 10;
     scoreText.setString("SCORE:"+to_string(playerScore));
+}
+void Player::resetScore()
+{
+    playerScore = 0;
+    scoreText.setString("SCORE:"+to_string(playerScore));
+}
+
+int Player::getPlayerScore()
+{
+    return playerScore;
 }
 
 void Player::addHealth()
@@ -137,6 +178,16 @@ void Player::loseHealth()
 {
     playerHealth--;
     healthText.setString("HEALTH:"+to_string(playerHealth));
+}
+void Player::resetHealth()
+{
+    playerHealth = 1;
+    healthText.setString("HEALTH:"+to_string(playerHealth));
+}
+
+int Player::getPlayerHealth()
+{
+    return playerHealth;
 }
 
 

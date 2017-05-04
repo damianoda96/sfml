@@ -41,13 +41,15 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-std=c++11" />
-			<Add directory="C:/Users/Deven Damiano/Desktop/sfml/include" />
+			<Add directory="C:/Users/Deven/Desktop/sfml/include" />
 		</Compiler>
 		<Linker>
-			<Add directory="C:/Users/Deven Damiano/Desktop/sfml/lib" />
+			<Add directory="C:/Users/Deven/Desktop/sfml/lib" />
 		</Linker>
 		<Unit filename="Collectible.cpp" />
 		<Unit filename="Collectible.h" />
+		<Unit filename="Door.cpp" />
+		<Unit filename="Door.h" />
 		<Unit filename="Enemy.cpp" />
 		<Unit filename="Enemy.h" />
 		<Unit filename="Menu.cpp" />
@@ -56,7 +58,9 @@
 		<Unit filename="Platform.h" />
 		<Unit filename="Player.cpp" />
 		<Unit filename="Player.h" />
+		<Unit filename="buildLevel.hpp" />
 		<Unit filename="collectibleArray.h" />
+		<Unit filename="doorArray.h" />
 		<Unit filename="enemyArray.h" />
 		<Unit filename="gameArrays.h" />
 		<Unit filename="main.cpp" />

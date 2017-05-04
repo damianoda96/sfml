@@ -2,6 +2,7 @@
 #define ENEMY_H_INCLUDED
 
 #include <SFML/Graphics.hpp>
+#include "Player.h"
 
 struct Enemy
 {
@@ -15,6 +16,8 @@ struct Enemy
     float getEnemyBottom();
     float getEnemyLeft();
     float getEnemyRight();
+
+    bool checkCollision(Player);
 
 };
 

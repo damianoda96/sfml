@@ -1,10 +1,21 @@
 # depslib dependency file v1.0
-1489532713 source:c:\users\deven\desktop\sfml\main.cpp
+1492742954 source:c:\users\deven\desktop\sfml\main.cpp
 	<SFML/Graphics.hpp>
-	<../Player.h>
-	<../Platform.h>
-	<../Menu.h>
-	<../platformArray.h>
+	"Player.h"
+	"Platform.h"
+	"Menu.h"
+	"platformArray.h"
+	"Collectible.h"
+	"collectibleArray.h"
+	"Enemy.h"
+	"enemyArray.h"
+	"createGameObjects.hpp"
+	"buildLevel.hpp"
+	"Door.h"
+	"doorArray.h"
+	<iostream>
+	<string>
+	<sstream>
 
 1488304418 c:\users\deven\desktop\sfml\include\sfml\graphics.hpp
 	<SFML/Window.hpp>
@@ -394,36 +405,43 @@
 	<string>
 	<vector>
 
-1489530194 c:\users\deven\desktop\sfml\player.h
+1492729941 c:\users\deven\desktop\sfml\player.h
 	<iostream>
 	<SFML/Graphics.hpp>
+	<iostream>
+	<string>
 
-1489530694 source:c:\users\deven\desktop\sfml\player.cpp
+1493766043 source:c:\users\deven\desktop\sfml\player.cpp
 	<SFML/Graphics.hpp>
-	<../Player.h>
+	"Player.h"
+	<iostream>
+	<string>
+	<sstream>
 
-1489422140 c:\users\deven\desktop\sfml\platform.h
+1492730193 c:\users\deven\desktop\sfml\platform.h
+	<SFML/Graphics.hpp>
+	"Player.h"
+
+1492742764 source:c:\users\deven\desktop\sfml\platform.cpp
+	<SFML/Graphics.hpp>
+	"Platform.h"
+
+1491949334 c:\users\deven\desktop\sfml\menu.h
 	<SFML/Graphics.hpp>
 
-1489422292 source:c:\users\deven\desktop\sfml\platform.cpp
-	<SFML/Graphics.hpp>
-	<../Platform.h>
-
-1488921052 c:\users\deven\desktop\sfml\menu.h
-	<SFML/Graphics.hpp>
-
-1488921194 source:c:\users\deven\desktop\sfml\menu.cpp
+1491949403 source:c:\users\deven\desktop\sfml\menu.cpp
 	<SFML/Graphics.hpp>
 	<../Menu.h>
 
-1489069718 c:\users\deven\desktop\sfml\platformarray.h
-	<../gameArrays.h>
+1491514441 c:\users\deven\desktop\sfml\platformarray.h
 	<iostream>
 	<vector>
+	"gameArrays.h"
+	"Platform.h"
 
-1489069116 c:\users\deven\desktop\sfml\gamearrays.h
+1491166490 c:\users\deven\desktop\sfml\gamearrays.h
 
-1491172191 source:c:\users\deven damiano\desktop\sfml\main.cpp
+1491194462 source:c:\users\deven damiano\desktop\sfml\main.cpp
 	<SFML/Graphics.hpp>
 	"Player.h"
 	"Platform.h"
@@ -880,15 +898,70 @@
 1491166488 c:\users\deven damiano\desktop\sfml\enemy.h
 	<SFML/Graphics.hpp>
 
-1491171693 c:\users\deven damiano\desktop\sfml\enemyarray.h
+1491192923 c:\users\deven damiano\desktop\sfml\enemyarray.h
 	"gameArrays.h"
+	"Enemy.h"
 	<iostream>
 	<vector>
-	"Enemy.h"
 
 1491172663 c:\users\deven damiano\desktop\sfml\creategameobjects.hpp
 	<SFML/Graphics.hpp>
 	"platformArray.h"
 	"collectibleArray.h"
 	"enemyArray.h"
+
+1492119533 source:c:\users\deven\desktop\sfml\collectible.cpp
+	<SFML/Graphics.hpp>
+	<../Collectible.h>
+
+1492119351 c:\users\deven\desktop\sfml\collectible.h
+	<SFML/Graphics.hpp>
+	"Player.h"
+
+1491932832 source:c:\users\deven\desktop\sfml\enemy.cpp
+	<SFML/Graphics.hpp>
+	"Enemy.h"
+
+1491932669 c:\users\deven\desktop\sfml\enemy.h
+	<SFML/Graphics.hpp>
+	"Player.h"
+
+1491171660 c:\users\deven\desktop\sfml\collectiblearray.h
+	"gameArrays.h"
+	<iostream>
+	<vector>
+	"Collectible.h"
+
+1491192924 c:\users\deven\desktop\sfml\enemyarray.h
+	"gameArrays.h"
+	"Enemy.h"
+	<iostream>
+	<vector>
+
+1491172664 c:\users\deven\desktop\sfml\creategameobjects.hpp
+	<SFML/Graphics.hpp>
+	"platformArray.h"
+	"collectibleArray.h"
+	"enemyArray.h"
+
+1492748569 c:\users\deven\desktop\sfml\buildlevel.hpp
+	<SFML/Graphics.hpp>
+	"platformArray.h"
+	"collectibleArray.h"
+	"enemyArray.h"
+	"doorArray.h"
+
+1491947868 source:c:\users\deven\desktop\sfml\door.cpp
+	<SFML/Graphics.hpp>
+	"Door.h"
+
+1491947857 c:\users\deven\desktop\sfml\door.h
+	<SFML/Graphics.hpp>
+	"Player.h"
+
+1491948006 c:\users\deven\desktop\sfml\doorarray.h
+	"gameArrays.h"
+	<iostream>
+	<vector>
+	"Door.h"
 
