@@ -63,6 +63,7 @@
 		<Unit filename="doorArray.h" />
 		<Unit filename="enemyArray.h" />
 		<Unit filename="gameArrays.h" />
+		<Unit filename="levelSwitcher.hpp" />
 		<Unit filename="main.cpp" />
 		<Unit filename="platformArray.h" />
 		<Extensions>
